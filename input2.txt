@@ -1,0 +1,6 @@
+user1 A view
+user2 B purchase
+user3 A purchase
+user1 C like
+user2 A purchase
+user3 B like
