@@ -24,12 +24,14 @@ ZOOKEEPER="~/programs/zookeeper/zookeeper-3.4.6/bin"
 KAFKA="~/programs/kafka/kafka_2.10-0.9.0.1/bin"
 PIG="~/programs/pig/pig-0.15.0/bin"
 JAVA_HOME="/usr/lib/jvm/java-7-openjdk-i386"
-FULLPATH=PATH=$PATH:$ZOOKEEPER:$KAFKA:$PIG:$JAVA_HOME
-echo $FULLPATH | sudo tee /etc/environment
-source /etc/environment
+FULLPATH=PATH='$PATH':$ZOOKEEPER:$KAFKA:$PIG:$JAVA_HOME
+echo export $FULLPATH | sudo tee -a ~/.bashrc
 
 SET_JAVA_HOME="export JAVA_HOME=$JAVA_HOME"
 echo $SET_JAVA_HOME | sudo tee -a ~/.bashrc
 source ~/.bashrc
 
 sudo chmod -R 777 ~/programs
+
+sudo apt-get install python-pip
+sudo pip install Jinja2

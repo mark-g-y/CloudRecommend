@@ -1,10 +1,14 @@
 
-inp = load './input.txt' using PigStorage(' ') as (user: chararray, item: chararray, event: chararray);
-affinity = load './affinity.txt' using PigStorage(' ') as (event: chararray, score: float);
+register 'affinityprocessor.py' using jython as affinity;
 
-inpaff = join inp by event, affinity by event;
-inpaff = group inpaff by (inp::user, inp::item);
-u_to_i = foreach inpaff generate group.inp::user as user, group.inp::item as item, SUM(inpaff.score) as score;
+inp = load './input.txt' using PigStorage(' ') as (user: chararray, item: chararray, event: chararray, time: float);
+
+inpaff = foreach inp {
+    fields = affinity.add_affinity(user, item, event, time);
+    generate fields.user, fields.item, fields.score;
+}
+inpaff = group inpaff by (user, item);
+u_to_i = foreach inpaff generate group.user as user, group.item as item, SUM(inpaff.score) as score;
 u_to_i2 = foreach u_to_i generate *;
 
 i_to_i = join u_to_i by user, u_to_i2 by user;
