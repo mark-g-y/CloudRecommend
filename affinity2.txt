@@ -1,3 +1,0 @@
-view 0.2
-like 3
-purchase 10
