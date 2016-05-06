@@ -1,0 +1,31 @@
+
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile('org.apache.kafka:kafka_2.10:0.8.0') {
+        exclude module: 'jms'
+        exclude module: 'jmxtools'
+        exclude module: 'jmxri'
+    }
+
+    testCompile 'junit:junit:4.12'
+}
+
+task eventreceiverjar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'EventReceiver',
+                'Implementation-Version': 1.0,
+                'Main-Class': 'com.cloudrecommend.EventReceiver'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+artifacts {
+    archives eventreceiverjar
+}

@@ -1,5 +1,6 @@
 sudo apt-get update
 sudo apt-get install default-jre
+sudo apt-get install openjdk-7-jdk
 sudo apt-get install scala
 
 sudo mkdir ~/programs
@@ -35,3 +36,7 @@ sudo chmod -R 777 ~/programs
 
 sudo apt-get install python-pip
 sudo pip install Jinja2
+
+sudo add-apt-repository ppa:cwchien/gradle
+sudo apt-get update
+sudo apt-get install gradle
