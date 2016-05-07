@@ -1,1 +1,1 @@
-zkServer.sh stop
+zkServer.sh start
