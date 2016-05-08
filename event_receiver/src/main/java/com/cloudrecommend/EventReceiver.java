@@ -16,24 +16,26 @@ import kafka.javaapi.consumer.ConsumerConnector;
 public class EventReceiver {
 
     private static final int DEFAULT_NUM_STREAMS = 1;
+    private static final String GROUP_ID = "event_processor";
+    private static final String TOPIC = "events";
 
     private ConsumerConnector consumer;
     private List<KafkaStream<byte[], byte[]>> streams;
     private ExecutorService executor;
 
-    public EventReceiver(String zookeeperAddress, String groupId, String topic, int numStreams) {
-        consumer = Consumer.createJavaConsumerConnector(createConsumerConfig(zookeeperAddress, groupId));
+    public EventReceiver(String zookeeperAddress, int numStreams) {
+        consumer = Consumer.createJavaConsumerConnector(createConsumerConfig(zookeeperAddress, GROUP_ID));
 
         executor = Executors.newFixedThreadPool(numStreams);
 
         Map<String, Integer> topicCountMap = new HashMap<String, Integer>();
-        topicCountMap.put(topic, numStreams);
+        topicCountMap.put(TOPIC, numStreams);
         Map<String, List<KafkaStream<byte[], byte[]>>> consumerMap = consumer.createMessageStreams(topicCountMap);
-        streams = consumerMap.get(topic);
+        streams = consumerMap.get(TOPIC);
     }
 
-    public EventReceiver(String zookeeperAddress, String groupId, String topic) {
-        this(zookeeperAddress, groupId, topic, DEFAULT_NUM_STREAMS);
+    public EventReceiver(String zookeeperAddress) {
+        this(zookeeperAddress, DEFAULT_NUM_STREAMS);
     }
 
     public void start() {
@@ -55,10 +57,11 @@ public class EventReceiver {
 
     public static void main(String[] arg) {
         int numProcesses = DEFAULT_NUM_STREAMS;
-        if (arg.length == 4) {
-            numProcesses = Integer.parseInt(arg[3]);
+        if (arg.length == 2) {
+            numProcesses = Integer.parseInt(arg[1]);
         }
-        EventReceiver eventReceiver = new EventReceiver(arg[0], arg[1], arg[2], numProcesses);
+        String zookeeperAddress = arg[0];
+        EventReceiver eventReceiver = new EventReceiver(zookeeperAddress, numProcesses);
         eventReceiver.start();   
     }
 }
