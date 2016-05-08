@@ -23,12 +23,18 @@ import org.json.JSONObject;
 
 public class StreamProcessor implements Runnable {
 
+    private String id;
     private int processId;
     private KafkaStream stream;
+    private String hdfsUri;
 
-    public StreamProcessor(int processId, KafkaStream stream) {
+    public StreamProcessor(int processId, KafkaStream stream, String hdfsUri) {
         this.processId = processId;
         this.stream = stream;
+        this.hdfsUri = "hdfs://" + hdfsUri + "/";
+
+        // unique ID for this process and machine
+        id = Long.toString(System.currentTimeMillis()) + Double.toString(Math.round((Math.random() * 100))) + processId;
     }
 
     @Override
@@ -60,19 +66,20 @@ public class StreamProcessor implements Runnable {
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
             String date = format.format(cal.getTime());
             String eventGroup = event.getString("group");
-            String path = eventGroup + "/" + date;
+            String path = eventGroup + "/" + eventGroup + "_" + date + "_" + id;
 
             Configuration conf = new Configuration();
             conf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
             conf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName());
             conf.set("dfs.client.block.write.replace-datanode-on-failure.enable", "false");
-            FileSystem hdfs = FileSystem.get(new URI("hdfs://localhost:9000"), conf);
-            hdfs.mkdirs(new Path("hdfs://localhost:9000/" + eventGroup));
-            Path file = new Path("hdfs://localhost:9000/" + path);
+
+            FileSystem hdfs = FileSystem.get(new URI(hdfsUri), conf);
+            hdfs.mkdirs(new Path(hdfsUri + eventGroup));
+            Path file = new Path(hdfsUri + path);
             if (!hdfs.exists(file)) {
                 hdfs.create(file);
                 hdfs.close();
-                hdfs = FileSystem.get(new URI("hdfs://localhost:9000"), conf);
+                hdfs = FileSystem.get(new URI(hdfsUri), conf);
             }
             OutputStream os = hdfs.append(file);
             BufferedWriter br = new BufferedWriter(new OutputStreamWriter(os));
@@ -80,20 +87,9 @@ public class StreamProcessor implements Runnable {
             br.close();
             hdfs.close();
 
-            //exec(String.format("hadoop fs -mkdir -p %s", eventGroup));
-            //exec(String.format("echo '' | hdfs dfs -put - %s", path));
-            //exec(String.format("echo \"%s\" | hdfs dfs -appendToFile - %s", eventLogBuilder.toString(), path));
-
         } catch(Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private void exec(String command) throws IOException, InterruptedException {
-        Process p = Runtime.getRuntime().exec(command);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        while ((reader.readLine()) != null) {}
-        p.waitFor();
     }
 
 }

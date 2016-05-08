@@ -23,8 +23,11 @@ public class EventReceiver {
     private List<KafkaStream<byte[], byte[]>> streams;
     private ExecutorService executor;
 
-    public EventReceiver(String zookeeperAddress, int numStreams) {
-        consumer = Consumer.createJavaConsumerConnector(createConsumerConfig(zookeeperAddress, GROUP_ID));
+    private String hdfsUri;
+
+    public EventReceiver(String zookeeperUri, String hdfsUri, int numStreams) {
+        this.hdfsUri = hdfsUri;
+        consumer = Consumer.createJavaConsumerConnector(createConsumerConfig(zookeeperUri, GROUP_ID));
 
         executor = Executors.newFixedThreadPool(numStreams);
 
@@ -34,19 +37,19 @@ public class EventReceiver {
         streams = consumerMap.get(TOPIC);
     }
 
-    public EventReceiver(String zookeeperAddress) {
-        this(zookeeperAddress, DEFAULT_NUM_STREAMS);
+    public EventReceiver(String zookeeperUri, String hdfsUri) {
+        this(zookeeperUri, hdfsUri, DEFAULT_NUM_STREAMS);
     }
 
     public void start() {
         for (int i = 0; i < streams.size(); i++) {
-            executor.submit(new StreamProcessor(i, streams.get(i)));
+            executor.submit(new StreamProcessor(i, streams.get(i), hdfsUri));
         }
     }
 
-    private ConsumerConfig createConsumerConfig(String zookeeperAddress, String groupId) {
+    private ConsumerConfig createConsumerConfig(String zookeeperUri, String groupId) {
         Properties props = new Properties();
-        props.put("zookeeper.connect", zookeeperAddress);
+        props.put("zookeeper.connect", zookeeperUri);
         props.put("group.id", groupId);
         props.put("zookeeper.session.timeout.ms", "400");
         props.put("zookeeper.sync.time.ms", "200");
@@ -57,11 +60,12 @@ public class EventReceiver {
 
     public static void main(String[] arg) {
         int numProcesses = DEFAULT_NUM_STREAMS;
-        if (arg.length == 2) {
+        if (arg.length == 3) {
             numProcesses = Integer.parseInt(arg[1]);
         }
-        String zookeeperAddress = arg[0];
-        EventReceiver eventReceiver = new EventReceiver(zookeeperAddress, numProcesses);
+        String zookeeperUri = arg[0];
+        String hdfsUri = arg[1];
+        EventReceiver eventReceiver = new EventReceiver(zookeeperUri, hdfsUri, numProcesses);
         eventReceiver.start();   
     }
 }
