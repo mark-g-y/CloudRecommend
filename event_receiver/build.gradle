@@ -11,6 +11,9 @@ dependencies {
         exclude module: 'jmxtools'
         exclude module: 'jmxri'
     }
+    compile 'org.apache.hadoop:hadoop-client:2.7.2'
+    compile 'org.apache.hadoop:hadoop-hdfs:2.7.2'
+    compile 'org.json:json:20090211'
 
     testCompile 'junit:junit:4.12'
 }
