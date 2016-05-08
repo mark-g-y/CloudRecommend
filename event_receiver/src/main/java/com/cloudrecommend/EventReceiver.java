@@ -1,22 +1,48 @@
 
 package com.cloudrecommend;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 import java.util.Properties;
 
 import kafka.consumer.Consumer;
-import kafka.consumer.ConsumerIterator;
 import kafka.consumer.ConsumerConfig;
 import kafka.consumer.KafkaStream;
 import kafka.javaapi.consumer.ConsumerConnector;
 
 public class EventReceiver {
 
-    private static ConsumerConnector consumer;
+    private static final int DEFAULT_NUM_STREAMS = 1;
 
-    private static ConsumerConfig createConsumerConfig(String zookeeperAddress, String groupId) {
+    private ConsumerConnector consumer;
+    private List<KafkaStream<byte[], byte[]>> streams;
+    private ExecutorService executor;
+
+    public EventReceiver(String zookeeperAddress, String groupId, String topic, int numStreams) {
+        consumer = Consumer.createJavaConsumerConnector(createConsumerConfig(zookeeperAddress, groupId));
+
+        executor = Executors.newFixedThreadPool(numStreams);
+
+        Map<String, Integer> topicCountMap = new HashMap<String, Integer>();
+        topicCountMap.put(topic, numStreams);
+        Map<String, List<KafkaStream<byte[], byte[]>>> consumerMap = consumer.createMessageStreams(topicCountMap);
+        streams = consumerMap.get(topic);
+    }
+
+    public EventReceiver(String zookeeperAddress, String groupId, String topic) {
+        this(zookeeperAddress, groupId, topic, DEFAULT_NUM_STREAMS);
+    }
+
+    public void start() {
+        for (int i = 0; i < streams.size(); i++) {
+            executor.submit(new StreamProcessor(i, streams.get(i)));
+        }
+    }
+
+    private ConsumerConfig createConsumerConfig(String zookeeperAddress, String groupId) {
         Properties props = new Properties();
         props.put("zookeeper.connect", zookeeperAddress);
         props.put("group.id", groupId);
@@ -27,27 +53,12 @@ public class EventReceiver {
         return new ConsumerConfig(props);
     }
 
-    private static void consume(KafkaStream stream) {
-        ConsumerIterator<byte[], byte[]> it = stream.iterator();
-        while (it.hasNext()) {
-            System.out.println(new String(it.next().message()));
-        }
-        System.out.println("Shutting down");
-    }
-
     public static void main(String[] arg) {
-        String groupId = arg[0];
-        String topic = arg[1];
-        System.out.println("args: " + groupId + ", " + topic);
-        consumer = Consumer.createJavaConsumerConnector(createConsumerConfig("localhost:2181", groupId));
-
-        Map<String, Integer> topicCountMap = new HashMap<String, Integer>();
-        topicCountMap.put(topic, 1);
-        Map<String, List<KafkaStream<byte[], byte[]>>> consumerMap = consumer.createMessageStreams(topicCountMap);
-        List<KafkaStream<byte[], byte[]>> streams = consumerMap.get(topic);
-
-        for (KafkaStream stream : streams) {
-            consume(stream);
+        int numProcesses = DEFAULT_NUM_STREAMS;
+        if (arg.length == 4) {
+            numProcesses = Integer.parseInt(arg[3]);
         }
+        EventReceiver eventReceiver = new EventReceiver(arg[0], arg[1], arg[2], numProcesses);
+        eventReceiver.start();   
     }
 }
