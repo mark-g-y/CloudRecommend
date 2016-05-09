@@ -34,7 +34,7 @@ public class StreamProcessor implements Runnable {
         this.hdfsUri = "hdfs://" + hdfsUri + "/";
 
         // unique ID for this process and machine
-        id = Long.toString(System.currentTimeMillis()) + Double.toString(Math.round((Math.random() * 100))) + processId;
+        id = Long.toString(System.currentTimeMillis()) + Long.toString((int)Math.round((Math.random() * 100))) + processId;
     }
 
     @Override
