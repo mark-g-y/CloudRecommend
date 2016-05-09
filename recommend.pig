@@ -1,7 +1,7 @@
 
 register 'affinityprocessor.py' using jython as affinity;
 
-inp = load './input.txt' using PigStorage(' ') as (user: chararray, item: chararray, event: chararray, time: float);
+inp = load '$filename' using PigStorage(' ') as (user: chararray, item: chararray, event: chararray, time: float);
 
 inpaff = foreach inp {
     fields = affinity.add_affinity(user, item, event, time);
