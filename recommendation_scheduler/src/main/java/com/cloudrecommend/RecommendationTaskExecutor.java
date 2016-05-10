@@ -1,14 +1,7 @@
 package com.cloudrecommend;
 
-import org.apache.pig.ExecType;
-import org.apache.pig.PigServer;
-import org.apache.pig.data.Tuple;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Properties;
 
 public class RecommendationTaskExecutor {
 
@@ -31,10 +24,15 @@ public class RecommendationTaskExecutor {
 
     private void shellExec(String command) {
         try {
+            System.out.println("executing command - " + command);
             Process p = Runtime.getRuntime().exec(command);
             BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            while ((reader.readLine()) != null) {}
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
             p.waitFor();
+            System.out.println("done executing");
         } catch(Exception e) {
             e.printStackTrace();
         }

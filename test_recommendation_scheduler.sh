@@ -1,0 +1,1 @@
+curl -H "Content-Type: application/json" -X GET -d '{"group":"ecommercesiteA","delayBetweenExec":5000}' http://localhost:1738/task
