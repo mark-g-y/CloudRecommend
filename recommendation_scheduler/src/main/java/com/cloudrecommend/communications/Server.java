@@ -1,10 +1,6 @@
 package com.cloudrecommend.communications;
 
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.HashMap;
 
 public class Server {
@@ -27,9 +23,10 @@ public class Server {
                 try {
                     ServerSocket socket = new ServerSocket(port);
                     while(true) {
-                        int id = assignClientId();
-                        HandlerThread thread = new HandlerThread(socket.accept(), receiver);
-                        connections.put(Integer.toString(id), thread);
+                        String id = Integer.toString(assignClientId());
+                        HandlerThread thread = new HandlerThread(id, socket.accept(), receiver);
+                        thread.start();
+                        connections.put(id, thread);
                     }
                 } catch(Exception e) {
                     e.printStackTrace();

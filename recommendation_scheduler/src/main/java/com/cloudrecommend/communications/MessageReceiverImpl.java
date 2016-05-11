@@ -18,14 +18,14 @@ public class MessageReceiverImpl implements MessageReceiver {
     }
 
     @Override
-    public void receive(String messageStr, MessageSender sender) {
+    public void receive(String clientId, String messageStr, MessageSender sender) {
         JSONObject message = JSON.create(messageStr);
         if ("new_task".equals(JSON.getString(message, "message"))) {
             String group = JSON.getString(message, "group");
             long delayBetweenExec = JSON.getLong(message, "delayBetweenExec");
             taskQueue.add(new Task(group, delayBetweenExec));
         } else if ("worker_ready".equals(JSON.getString(message, "message"))) {
-            workersQueue.add(JSON.getString(message, "worker_id"));
+            workersQueue.add(clientId);
         }
     }
 }

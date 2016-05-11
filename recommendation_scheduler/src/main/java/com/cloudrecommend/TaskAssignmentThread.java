@@ -3,6 +3,7 @@ package com.cloudrecommend;
 
 import com.cloudrecommend.communications.Server;
 import com.cloudrecommend.jsonutil.JSON;
+import com.cloudrecommend.models.Task;
 import org.json.JSONObject;
 
 public class TaskAssignmentThread extends Thread {
@@ -15,13 +16,16 @@ public class TaskAssignmentThread extends Thread {
         this.taskQueue = TaskQueue.getInstance();
         this.workersQueue = AvailableWorkersQueue.getInstance();
         this.messageServer = messageServer;
+
+        //<TODO> debug only
+        taskQueue.add(new Task("B", 3600000));
     }
 
     @Override
     public void run() {
         while (true) {
             try {
-                final com.cloudrecommend.models.Task task = taskQueue.take();
+                final Task task = taskQueue.take();
                 System.out.println("Took task " + task.getGroup());
                 final String workerId = workersQueue.take();
                 System.out.println("Took worker " + workerId);

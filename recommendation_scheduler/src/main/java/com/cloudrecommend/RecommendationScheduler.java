@@ -17,9 +17,6 @@ public class RecommendationScheduler {
     public static void main(String[] arg) {
         int serverPort = Integer.parseInt(arg[0]);
 
-        //TaskReceiver taskReceiver = new TaskReceiver(serverPort);
-        //taskReceiver.start();
-
         RecommendationScheduler recommendationScheduler = new RecommendationScheduler();
         recommendationScheduler.start(serverPort);
     }

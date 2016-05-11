@@ -6,8 +6,6 @@ repositories {
 }
 
 dependencies {
-    compile 'org.eclipse.jetty:jetty-server:9.3.8.v20160314'
-    compile 'org.eclipse.jetty:jetty-servlet:9.3.8.v20160314'
     compile 'org.json:json:20090211'
 
     testCompile 'junit:junit:4.12'

@@ -1,23 +1,24 @@
 package com.cloudrecommend.communications;
 
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.Socket;
 
 public class HandlerThread extends Thread implements MessageSender {
 
+    private String id;
     private Socket socket;
-    private ObjectInputStream ois;
-    private ObjectOutputStream oos;
+    private BufferedReader input;
+    private PrintWriter output;
     private MessageReceiver messageReceiver;
 
-    public HandlerThread(Socket socket, MessageReceiver messageReceiver) {
+    public HandlerThread(String id, Socket socket, MessageReceiver messageReceiver) {
         super();
         try {
+            this.id = id;
             this.messageReceiver = messageReceiver;
             this.socket = socket;
-            this.ois = new ObjectInputStream(socket.getInputStream());
-            this.oos = new ObjectOutputStream(socket.getOutputStream());
+            this.input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            this.output = new PrintWriter(socket.getOutputStream(), true);
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -27,12 +28,11 @@ public class HandlerThread extends Thread implements MessageSender {
     public void run() {
         try {
             String message;
-            while((message = (String)ois.readObject()) != null) {
-                messageReceiver.receive(message, this);
+            while((message = input.readLine()) != null) {
+                System.out.println(id + " received message: " + message);
+                messageReceiver.receive(id, message, this);
             }
-            ois.close();
-            oos.close();
-            socket.close();
+            close();
         } catch(Exception e) {
         }
         close();
@@ -40,8 +40,8 @@ public class HandlerThread extends Thread implements MessageSender {
 
     private void close() {
         try {
-            ois.close();
-            oos.close();
+            input.close();
+            output.close();
             socket.close();
         } catch(Exception e) {
         }
@@ -50,7 +50,7 @@ public class HandlerThread extends Thread implements MessageSender {
     @Override
     public void sendMessage(String message) {
         try {
-            oos.writeObject(message);
+            output.println(message);
         } catch(Exception e) {
             e.printStackTrace();
         }
