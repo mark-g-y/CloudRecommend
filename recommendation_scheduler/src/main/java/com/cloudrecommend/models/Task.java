@@ -1,4 +1,4 @@
-package com.cloudrecommend;
+package com.cloudrecommend.models;
 
 public class Task implements Comparable {
 

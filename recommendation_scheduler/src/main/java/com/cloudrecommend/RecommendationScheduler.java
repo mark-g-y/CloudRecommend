@@ -1,45 +1,26 @@
 
 package com.cloudrecommend;
 
-import com.cloudrecommend.taskreceiver.TaskReceiver;
+import com.cloudrecommend.communications.*;
 
 public class RecommendationScheduler {
 
-    private final TaskQueue queue;
-    private RecommendationTaskExecutor executor;
-
-    public RecommendationScheduler(String hdfsUri) {
-        queue = TaskQueue.getInstance();
-        executor = new RecommendationTaskExecutor(hdfsUri);
+    public RecommendationScheduler() {
     }
 
-    public void start() {
-        while (true) {
-            try {
-                final Task task = queue.take();
-                System.out.println("Took task " + task.getGroup());
-                executor.execute(task, new Runnable() {
-                    @Override
-                    public void run() {
-                        task.updateExecTime();
-                        queue.add(task);
-                    }
-                });
-                Thread.sleep(5000);
-            } catch(InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+    public void start(int serverPort) {
+        Server messageServer = new Server(serverPort, new MessageReceiverImpl());
+        messageServer.start();
+        TaskAssignmentThread.runInstance(messageServer);
     }
 
     public static void main(String[] arg) {
-        String hdfsUri = arg[0];
-        int taskReceiverPort = Integer.parseInt(arg[1]);
+        int serverPort = Integer.parseInt(arg[0]);
 
-        TaskReceiver taskReceiver = new TaskReceiver(taskReceiverPort);
-        taskReceiver.start();
+        //TaskReceiver taskReceiver = new TaskReceiver(serverPort);
+        //taskReceiver.start();
 
-        RecommendationScheduler recommendationScheduler = new RecommendationScheduler(hdfsUri);
-        recommendationScheduler.start();
+        RecommendationScheduler recommendationScheduler = new RecommendationScheduler();
+        recommendationScheduler.start(serverPort);
     }
 }
