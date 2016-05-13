@@ -26,6 +26,10 @@ public class TaskAssignmentThread extends Thread {
         while (true) {
             try {
                 final Task task = taskQueue.take();
+                if (task.getExecTime() > System.currentTimeMillis()) {
+                    taskQueue.put(task);
+                    continue;
+                }
                 System.out.println("Took task " + task.getGroup());
                 final String workerId = workersQueue.take();
                 System.out.println("Took worker " + workerId);

@@ -22,9 +22,28 @@ uii = foreach uii generate u_to_i::user as user, i_to_i::item1 as item1, i_to_i:
 uii = group uii by user;
 uii = foreach uii {
 	sorted_score = order uii by score desc;
-	sorted_score = limit sorted_score 2;
+	sorted_score = limit sorted_score 10;
 	generate uii.user, uii.item1, uii.item2, flatten(sorted_score);
 }
 uii = foreach uii generate user, item1, item2, score;
 
-dump uii;
+uii = foreach uii {
+    key = CONCAT(user, '__');
+    key = CONCAT(key, item1);
+    generate key, user, item1, item2, score;
+}
+store uii into 'hbase://$group_uii' using org.apache.pig.backend.hadoop.hbase.HBaseStorage('uii:user,uii:item1,uii:item2,uii:score');
+
+i_to_i = group i_to_i by item1;
+i_to_i = foreach i_to_i {
+    sorted_score = order i_to_i by score desc;
+    sorted_score = foreach sorted_score generate item2, score;
+    sorted_score = limit sorted_score 10;
+    generate group as item1, flatten(sorted_score);
+}
+
+i_to_i = foreach i_to_i {
+    key = CONCAT(item1, item2);
+    generate key, item1, item2, score;
+}
+store i_to_i into 'hbase://$group_itoi' using org.apache.pig.backend.hadoop.hbase.HBaseStorage('itoi:item1,itoi:item2,itoi:score');

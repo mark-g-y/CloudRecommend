@@ -26,13 +26,19 @@ tar -xvzf hadoop-2.7.2.tar.gz
 sudo mkdir ~/programs/hadoop
 sudo mv hadoop-2.7.2 ~/programs/hadoop
 
+wget https://mirror.csclub.uwaterloo.ca/apache/hbase/stable/hbase-1.1.4-bin.tar.gz
+tar -xvzf hbase-1.1.4-bin.tar.gz
+sudo mkdir ~/programs/hbase
+sudo mv hbase-1.1.4 ~/programs/hbase
+
 ZOOKEEPER="~/programs/zookeeper/zookeeper-3.4.6/bin"
 KAFKA="~/programs/kafka/kafka_2.10-0.9.0.1/bin"
 PIG="~/programs/pig/pig-0.15.0/bin"
 HADOOP="~/programs/hadoop/hadoop-2.7.2/bin"
 HADOOPSH="~/programs/hadoop/hadoop-2.7.2/sbin"
+HBASE="~/programs/hbase/hbase-1.1.4/bin"
 JAVA_HOME="/usr/lib/jvm/java-7-openjdk-i386"
-FULLPATH=PATH='$PATH':$ZOOKEEPER:$KAFKA:$PIG:$HADOOP:$HADOOPSH:$JAVA_HOME
+FULLPATH=PATH='$PATH':$ZOOKEEPER:$KAFKA:$PIG:$HADOOP:$HADOOPSH:$HBASE:$JAVA_HOME
 echo export $FULLPATH | sudo tee -a ~/.bashrc
 
 SET_JAVA_HOME="export JAVA_HOME=$JAVA_HOME"
@@ -47,9 +53,16 @@ echo export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-i386 | sudo tee -a $HADOOP_HOM
 
 sudo chmod -R 777 ~/programs
 
+sudo apt-get install python-dev
 sudo apt-get install python-pip
 sudo pip install Jinja2
+sudo pip install happybase
 
 sudo add-apt-repository ppa:cwchien/gradle
 sudo apt-get update
 sudo apt-get install gradle
+
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
+echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.0.list
+sudo apt-get update
+sudo apt-get install -y mongodb
