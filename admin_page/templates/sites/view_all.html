@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+{% block content %}
+
+<a href="{{url_for('sites.new_site')}}" type="button" class="btn btn-med btn-primary">New Site</a>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>UID</th>
+      <th>Title</th>
+      <th>Analysis Run Frequency</th>
+      <th>Last Run</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for site in sites %}
+    <tr>
+      <td>{{site.uid}}</td>
+      <td>{{site.title}}</td>
+      <td>{{site.delay_between_runs}}</td>
+      <td>{{site.last_run_str()}}</td>
+      <td><a href="{{url_for('sites.edit_site', uid=site.uid)}}">Edit</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock content %}
+
+{% endblock body %}

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<form action="{{url_for('sites.update_site_submit')}}" method="post">
+  <input type="hidden" name="uid" value="{{uid}}">
+  Title: <input type="text" name="title" value="{{title}}"><br>
+  <input type="radio" name="delayBetweenExec" value="daily" {{'checked' if delay_between_runs=='daily' else ''}}>Daily<br>
+  <input type="radio" name="delayBetweenExec" value="weekly" {{'checked' if delay_between_runs=='weekly' else ''}}>Weekly<br>
+  <input type="radio" name="delayBetweenExec" value="biweekly" {{'checked' if delay_between_runs=='biweekly' else ''}}>Biweekly<br>
+<input type="submit" value="Submit">
+</form>
+
+{% endblock body %}
