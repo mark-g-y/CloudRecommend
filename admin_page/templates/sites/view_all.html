@@ -2,15 +2,15 @@
 
 {% block body %}
 
-{% block content %}
-
 <a href="{{url_for('sites.new_site')}}" type="button" class="btn btn-med btn-primary">New Site</a>
+<p style="margin-bottom: 15px"></p>
 
 <table class="table">
   <thead>
     <tr>
       <th>UID</th>
       <th>Title</th>
+      <th>Events</th>
       <th>Analysis Run Frequency</th>
       <th>Last Run</th>
     </tr>
@@ -20,6 +20,12 @@
     <tr>
       <td>{{site.uid}}</td>
       <td>{{site.title}}</td>
+      <td>
+      {% for event in site.events %}
+        {{event.name}} - {{event.score}}
+        <br/>
+      {% endfor %}
+      </td>
       <td>{{site.delay_between_runs}}</td>
       <td>{{site.last_run_str()}}</td>
       <td><a href="{{url_for('sites.edit_site', uid=site.uid)}}">Edit</a></td>
@@ -27,7 +33,5 @@
     {% endfor %}
   </tbody>
 </table>
-
-{% endblock content %}
 
 {% endblock body %}

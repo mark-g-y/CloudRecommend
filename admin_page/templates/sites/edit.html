@@ -2,13 +2,75 @@
 
 {% block body %}
 
+<style>
+.table tbody>tr>td{
+    vertical-align: middle;
+}
+</style>
+
 <form action="{{url_for('sites.update_site_submit')}}" method="post">
   <input type="hidden" name="uid" value="{{uid}}">
-  Title: <input type="text" name="title" value="{{title}}"><br>
-  <input type="radio" name="delayBetweenExec" value="daily" {{'checked' if delay_between_runs=='daily' else ''}}>Daily<br>
-  <input type="radio" name="delayBetweenExec" value="weekly" {{'checked' if delay_between_runs=='weekly' else ''}}>Weekly<br>
-  <input type="radio" name="delayBetweenExec" value="biweekly" {{'checked' if delay_between_runs=='biweekly' else ''}}>Biweekly<br>
-<input type="submit" value="Submit">
+
+  <div class="row form-group">
+    <label for="title" class="control-label col-sm-3">Title</label>
+    <input type="text" class="col-sm-3" name="title" value="{{title}}" />
+  </div>
+
+  <div class="row form-group">
+    <label for="delayBetweenExec" class="control-label col-sm-3">Delay Between Exec</label>
+    <label class="checkbox-inline"><input type="radio" name="delayBetweenExec" value="daily" {{'checked' if delay_between_runs=='daily' else ''}}>Daily</label>
+    <label class="checkbox-inline"><input type="radio" name="delayBetweenExec" value="weekly" {{'checked' if delay_between_runs=='weekly' else ''}}>Weekly</label>
+    <label class="checkbox-inline"><input type="radio" name="delayBetweenExec" value="biweekly" {{'checked' if delay_between_runs=='biweekly' else ''}}>Biweekly</label>
+  </div>
+
+  <div class="row form-group">
+    <label class="control-label col-sm-3">Events</label>
+  </div>
+
+  <table id="event_table" style="width: auto;">
+    <thead>
+      <th class="col-sm-5">Name</th>
+      <th class="col-sm-5">Score</th>
+      <th class="col-sm-3"></th>
+    </thead>
+    <tbody>
+      {% for event in events %}
+      <tr>
+          <td><input class="form-control" type="text" name="events[name]" value="{{event.name}}"></td>
+          <td><input class="form-control" type="number" step="any" name="events[score]" value="{{event.score}}"></td>
+          <td><a style="cursor:pointer" onclick="removeRow(this)">Delete</a></td>
+      </tr>
+      {% endfor %}
+      <tr id="new_row_template" style="display:none">
+        <td><input class="form-control" type="text" name="newevents[name]" disabled></td>
+        <td><input class="form-control" type="number" step="any" name="newevents[score]" disabled></td>
+        <td><a style="cursor:pointer; margin-left:5px" onclick="removeRow(this)">Delete</a></td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td></td><td></td>
+        <td><b><a style="cursor:pointer; margin-top:5px" onclick="addRow()">Add Event</a></b></td>
+      </tr>
+    </tfoot>
+  </table>
+  <input type="submit" value="Submit">
 </form>
 
+{% block scripts %}
+<script type="text/javascript">
+  function removeRow(element) {
+    $(element).parents('tr').remove();
+  }
+  function addRow() {
+    var newRow = $('#new_row_template').clone();
+    newRow.removeAttr('id');
+    $(":input", newRow).attr("disabled", false);
+    newRow.show();
+    $('#event_table tbody').append(newRow);
+  }
+</script>
+{% endblock scripts %}
+
 {% endblock body %}
+
