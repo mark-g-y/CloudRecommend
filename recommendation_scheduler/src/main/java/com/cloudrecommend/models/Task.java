@@ -7,9 +7,13 @@ public class Task implements Comparable {
     private long execTime;
 
     public Task(String group, long delayBetweenExec) {
+        this(group, delayBetweenExec, System.currentTimeMillis() - delayBetweenExec);
+    }
+
+    public Task(String group, long delayBetweenExec, long lastRun) {
         this.group = group;
         this.delayBetweenExec = delayBetweenExec;
-        this.execTime = System.currentTimeMillis() + delayBetweenExec;
+        this.execTime = lastRun + delayBetweenExec;
     }
 
     public String getGroup() {

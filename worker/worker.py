@@ -1,20 +1,25 @@
 
-import os
-import happybase
+import sys
+import socket
+import json
+import recommendation
 
-def run_recommendation(hdfsuri, group):
-    hbconn = happybase.Connection()
-    group_uii = group + '__uii'
-    group_itoi = group + '__itoi'
+args = sys.argv
+schedulerhost = args[1]
+schedulerport = int(args[2])
+hdfsuri = 'hdfs://{}/'.format(args[3])
 
-    try:
-        hbconn.create_table(group_uii, {'uii':dict()})
-        hbconn.create_table(group_itoi, {'itoi':dict()})
-    except:
-        # no worries - continue
-        print('table already exists')
-    hbconn.close()
-    
-    os.system('python affinity_generator.py')
-    #<TODO> switch from local to mapreduce mode in production
-    os.system('pig -x local -param filename={}{} -param group_uii={} -param group_itoi={} recommend.pig'.format(hdfsuri, group, group_uii, group_itoi))
+BUFFER_SIZE = 1024
+
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect((schedulerhost, schedulerport))
+
+while True:
+    s.sendall(json.dumps({'message' : 'worker_ready'}) + '\n')
+    messageobj = json.loads(s.recv(BUFFER_SIZE))
+    message = messageobj['message']
+    if message == 'new_task':
+        group_id = messageobj['group_id']
+        recommendation.run(hdfsuri, group_id)
+
+s.close()

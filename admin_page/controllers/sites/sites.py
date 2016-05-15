@@ -11,6 +11,7 @@ from flask import (
     jsonify
 )
 from models.models import *
+import task_sender
 
 sites = Blueprint('sites', __name__)
 
@@ -37,6 +38,11 @@ def update_site_submit():
     uid = request.form.get('uid')
     title = request.form.get('title')
     delay_between_exec = request.form.get('delayBetweenExec')
+    delay_between_exec_dict = {
+        'daily' : 1000 * 60 * 60 * 24,
+        'weekly' : 1000 * 60 * 60 * 24 * 7,
+        'biweekly' : 1000 * 60 * 60 * 24 * 14
+    }
 
     event_names = request.form.getlist('events[name]') + request.form.getlist('newevents[name]')
     event_scores = request.form.getlist('events[score]') + request.form.getlist('newevents[score]')
@@ -46,10 +52,11 @@ def update_site_submit():
 
     sites = Site.objects(uid=uid)
     if len(sites) == 0:
-        site = Site(uid=uuid.uuid4())
+        uid = uuid.uuid4()
+        site = Site(uid=uid)
+        task_sender.add_task(str(uid), delay_between_exec_dict[delay_between_exec])
     else:
         site = sites.get()
-        print('trying to get site ' + str(site.uid))
 
     site.title = title
     site.events = events

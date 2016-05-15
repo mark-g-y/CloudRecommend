@@ -20,6 +20,7 @@ public class MessageReceiverImpl implements MessageReceiver {
     @Override
     public void receive(String clientId, String messageStr, MessageSender sender) {
         JSONObject message = JSON.create(messageStr);
+        System.out.println("received message " + message);
         if ("new_task".equals(JSON.getString(message, "message"))) {
             String group = JSON.getString(message, "group");
             long delayBetweenExec = JSON.getLong(message, "delayBetweenExec");

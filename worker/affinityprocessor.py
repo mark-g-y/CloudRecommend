@@ -7,7 +7,7 @@ def add_affinity(user, item, event, timee):
     return user, item, adjust_score_by_time(score, timee) if score is not None else 0
 
 def adjust_score_by_time(score, timee):
-    current_time = 1462997841322
+    current_time = 1463267978454
     time_max_limits = [86400000L, 604800000L, 2629746000L, 31556952000L]
     adjustments = [1.5, 1.0, 0.5, 0.25]
 
