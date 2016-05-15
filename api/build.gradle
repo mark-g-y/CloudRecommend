@@ -1,0 +1,31 @@
+
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'javax.servlet:javax.servlet-api:3.0.1'
+    compile 'org.eclipse.jetty:jetty-server:9.3.8.v20160314'
+    compile 'org.eclipse.jetty:jetty-servlet:9.3.8.v20160314'
+    compile 'org.apache.hbase:hbase-client:1.2.1'
+    compile 'org.json:json:20090211'
+
+    testCompile 'junit:junit:4.12'
+}
+
+task apijar (type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'Api',
+                'Implementation-Version': 1.0,
+                'Main-Class': 'com.cloudrecommend.Api'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+artifacts {
+    archives apijar
+}
