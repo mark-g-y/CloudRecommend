@@ -59,6 +59,7 @@ sudo pip install Jinja2
 sudo pip install happybase
 sudo pip install Flask
 sudo pip install mongoengine
+sudo pip install pymongo
 
 sudo add-apt-repository ppa:cwchien/gradle
 sudo apt-get update

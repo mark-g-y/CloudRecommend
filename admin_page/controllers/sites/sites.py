@@ -54,14 +54,19 @@ def update_site_submit():
     if len(sites) == 0:
         uid = uuid.uuid4()
         site = Site(uid=uid)
-        task_sender.add_task(str(uid), delay_between_exec_dict[delay_between_exec])
+        new_task = True
     else:
         site = sites.get()
+        new_task = False
 
     site.title = title
     site.events = events
     site.delay_between_runs = delay_between_exec
     site.save()
+
+    if new_task:
+        # can only do this after site is already saved to avoid race conditions
+        task_sender.add_task(str(uid), delay_between_exec_dict[delay_between_exec])
 
     flash('Success!')
     return redirect(url_for('sites.view_all'))

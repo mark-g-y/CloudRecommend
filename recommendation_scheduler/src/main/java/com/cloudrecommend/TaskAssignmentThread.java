@@ -2,6 +2,7 @@ package com.cloudrecommend;
 
 
 import com.cloudrecommend.communications.Server;
+import com.cloudrecommend.db.MongoConfig;
 import com.cloudrecommend.jsonutil.JSON;
 import com.cloudrecommend.models.Task;
 import org.json.JSONObject;
@@ -16,13 +17,11 @@ public class TaskAssignmentThread extends Thread {
         this.taskQueue = TaskQueue.getInstance();
         this.workersQueue = AvailableWorkersQueue.getInstance();
         this.messageServer = messageServer;
-
-        //<TODO> debug only
-        taskQueue.add(new Task("B", 3600000));
     }
 
     @Override
     public void run() {
+        loadTasksFromDb();
         while (true) {
             try {
                 final Task task = taskQueue.take();
@@ -43,6 +42,11 @@ public class TaskAssignmentThread extends Thread {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void loadTasksFromDb() {
+        TaskQueue queue = TaskQueue.getInstance();
+        queue.addAll(Task.getAllFromDb(MongoConfig.getInstance().host(), MongoConfig.getInstance().port()));
     }
 
     public static void runInstance(Server messageServer) {
