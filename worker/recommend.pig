@@ -1,5 +1,6 @@
 
 register 'affinityprocessor.py' using jython as affinity;
+register 'itemsummarizer.py' using jython as summarizer;
 
 inp = load '$filename' using PigStorage(' ') as (user: chararray, item: chararray, event: chararray, time: float);
 
@@ -27,12 +28,12 @@ uii = foreach uii {
 }
 uii = foreach uii generate user, item1, item2, score;
 
+uii = group uii by user;
 uii = foreach uii {
-    key = CONCAT(user, '__');
-    key = CONCAT(key, item1);
-    generate key, user, item1, item2, score;
+    fields = summarizer.merge_uii_rec(uii.user, $1);
+    generate fields.user as key, fields.user, fields.items;
 }
-store uii into 'hbase://$group_uii' using org.apache.pig.backend.hadoop.hbase.HBaseStorage('uii:user,uii:item1,uii:item2,uii:score');
+store uii into 'hbase://$group_uii' using org.apache.pig.backend.hadoop.hbase.HBaseStorage('uii:user,uii:items');
 
 i_to_i = group i_to_i by item1;
 i_to_i = foreach i_to_i {
@@ -42,8 +43,9 @@ i_to_i = foreach i_to_i {
     generate group as item1, flatten(sorted_score);
 }
 
+i_to_i = group i_to_i by item1;
 i_to_i = foreach i_to_i {
-    key = CONCAT(item1, item2);
-    generate key, item1, item2, score;
+    fields = summarizer.merge_itoi_rec(i_to_i.item1, $1);
+    generate fields.item as key, fields.item, fields.items;
 }
-store i_to_i into 'hbase://$group_itoi' using org.apache.pig.backend.hadoop.hbase.HBaseStorage('itoi:item1,itoi:item2,itoi:score');
+store i_to_i into 'hbase://$group_itoi' using org.apache.pig.backend.hadoop.hbase.HBaseStorage('itoi:item,itoi:items');
