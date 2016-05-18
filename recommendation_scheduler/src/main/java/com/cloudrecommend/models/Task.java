@@ -35,7 +35,7 @@ public class Task implements Comparable {
         execTime += delayBetweenExec;
         System.out.println(mongoConfig);
         Mongo mongo = new Mongo(mongoConfig.host(), mongoConfig.port());
-        DB db = mongo.getDB("recommendengineaas");
+        DB db = mongo.getDB("cloudrecommend");
         DBCollection sites = db.getCollection("site");
         BasicDBObject query = new BasicDBObject().append("uid", group);
         BasicDBObject update = new BasicDBObject().append("$set", new BasicDBObject("last_run", System.currentTimeMillis()));
@@ -56,7 +56,7 @@ public class Task implements Comparable {
 
     public static ArrayList<Task> getAllFromDb(String mongoHost, int mongoPort) {
         Mongo mongo = new Mongo(mongoHost, mongoPort);
-        DB db = mongo.getDB("recommendengineaas");
+        DB db = mongo.getDB("cloudrecommend");
         DBCollection sites = db.getCollection("site");
         DBCursor cursor = sites.find();
         ArrayList<Task> tasks = new ArrayList<Task>();

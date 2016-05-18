@@ -15,7 +15,7 @@ def init(mongouri='mongodb://localhost:27017/'):
 
 def get_event_score_map(group):
     mongo = MongoClient(mongoUri)
-    sites = mongo.recommendengineaas.site
+    sites = mongo.cloudrecommend.site
     site = sites.find_one({'uid' : group})
     event_to_score_map = {}
     for event in site['events']:

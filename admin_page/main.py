@@ -6,10 +6,10 @@ import task_sender
 args = argv;
 if len(args) == 3:
     # default MongoDB configurations
-    connect('recommendengineaas')
+    connect('cloudrecommend')
     task_sender.start(args[1], int(args[2]))
 else:
-    connect('recommendengineaas', host=args[1], port=int(args[2]))
+    connect('cloudrecommend', host=args[1], port=int(args[2]))
     task_sender.start(args[3], int(args[4]))
 
 app = Flask(__name__)
