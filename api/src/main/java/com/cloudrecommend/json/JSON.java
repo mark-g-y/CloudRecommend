@@ -24,6 +24,15 @@ public class JSON {
         return new JSONArray();
     }
 
+    public static JSONArray createArray(String str) {
+        try {
+            return new JSONArray(str);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public static JSONObject put(JSONObject obj, String key, String value) {
         try {
             obj.put(key, value);

@@ -2,7 +2,6 @@ package com.cloudrecommend;
 
 
 import com.cloudrecommend.hbase.ZookeeperConfig;
-import com.cloudrecommend.servlets.EventServlet;
 import com.cloudrecommend.servlets.RecommendationForItemServlet;
 import com.cloudrecommend.servlets.RecommendationForUserServlet;
 import org.eclipse.jetty.server.Server;
@@ -16,9 +15,8 @@ public class Api {
         int zookeeperPort = Integer.parseInt(arg[1]);
         ZookeeperConfig.getInstance().init(zookeeperHost, zookeeperPort);
 
-        Server server = new Server(1739);
+        Server server = new Server(Integer.parseInt(arg[2]));
         ServletHandler handler = new ServletHandler();
-        handler.addServletWithMapping(EventServlet.class, "/event");
         handler.addServletWithMapping(RecommendationForUserServlet.class, "/recommendation/user");
         handler.addServletWithMapping(RecommendationForItemServlet.class, "/recommendation/item");
         server.setHandler(handler);
