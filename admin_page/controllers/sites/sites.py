@@ -24,7 +24,7 @@ def view_all():
 
 @sites.route('/new', methods=["GET"])
 def new_site():
-    return render_template('sites/edit.html')
+    return render_template('sites/edit.html', is_default=True)
 
 
 @sites.route('/edit/<uid>', methods=["GET"])
@@ -69,4 +69,18 @@ def update_site_submit():
         task_sender.add_task(str(uid), delay_between_exec_dict[delay_between_exec])
 
     flash('Success!')
+    return redirect(url_for('sites.view_all'))
+
+
+@sites.route('/delete/', methods=['POST'])
+def delete_blank_site_submit():
+    return redirect(url_for('sites.view_all'))
+
+
+@sites.route('/delete/<uid>', methods=['POST'])
+def delete_site_submit(uid):
+    site = Site.objects(uid=uid)
+    site.delete()
+    flash('Successfully deleted!')
+
     return redirect(url_for('sites.view_all'))

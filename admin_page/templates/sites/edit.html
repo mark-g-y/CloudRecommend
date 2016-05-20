@@ -5,6 +5,7 @@
 <style>
 .table tbody>tr>td{
   vertical-align: middle;
+  table-layout: fixed;
 }
 .labeltitle {
   font-size: 18px;
@@ -26,7 +27,7 @@
 
   <div class="row form-group">
     <label for="delayBetweenExec" class="control-label col-sm-3 labeltitle">Delay Between Exec</label>
-    <label class="checkbox-inline"><input type="radio" name="delayBetweenExec" value="daily" {{'checked' if delay_between_runs=='daily' else ''}}>Daily</label>
+    <label class="checkbox-inline"><input type="radio" name="delayBetweenExec" value="daily" {{'checked' if delay_between_runs=='daily' or is_default else ''}}>Daily</label>
     <label class="checkbox-inline"><input type="radio" name="delayBetweenExec" value="weekly" {{'checked' if delay_between_runs=='weekly' else ''}}>Weekly</label>
     <label class="checkbox-inline"><input type="radio" name="delayBetweenExec" value="biweekly" {{'checked' if delay_between_runs=='biweekly' else ''}}>Biweekly</label>
   </div>
@@ -35,23 +36,23 @@
     <label class="control-label col-sm-3 labeltitle">Events</label>
   </div>
 
-  <table id="event_table" style="width: auto;">
+  <table id="event_table" style="width: 75%;">
     <thead>
-      <th class="col-sm-5 subheader">Name</th>
-      <th class="col-sm-5 subheader">Score</th>
-      <th class="col-sm-3 subheader"></th>
+      <th class="col-md-3 subheader">Name</th>
+      <th class="col-md-3 subheader">Score</th>
+      <th class="col-md-5 subheader"></th>
     </thead>
     <tbody>
       {% for event in events %}
       <tr>
-          <td><input class="form-control" type="text" name="events[name]" value="{{event.name}}"></td>
-          <td><input class="form-control" type="number" step="any" name="events[score]" value="{{event.score}}"></td>
+          <td><input class="form-control" type="text" name="events[name]" value="{{event.name}}" required="true"></td>
+          <td><input class="form-control" type="number" step="any" name="events[score]" value="{{event.score}}" required="true"></td>
           <td><a style="cursor:pointer; margin-left:5px" onclick="removeRow(this)">Delete</a></td>
       </tr>
       {% endfor %}
       <tr id="new_row_template" style="display:none">
-        <td><input class="form-control" type="text" name="newevents[name]" disabled></td>
-        <td><input class="form-control" type="number" step="any" name="newevents[score]" disabled></td>
+        <td><input class="form-control" type="text" name="newevents[name]" required="true" disabled></td>
+        <td><input class="form-control" type="number" step="any" name="newevents[score]" required="true" disabled></td>
         <td><a style="cursor:pointer; margin-left:5px" onclick="removeRow(this)">Delete</a></td>
       </tr>
     </tbody>
@@ -63,6 +64,11 @@
     </tfoot>
   </table>
   <input type="submit" value="Submit">
+</form>
+
+<form action="{{url_for('sites.delete_site_submit', uid=uid)}}" method="post">
+  <input type="hidden" name="uid" value="{{uid}}">
+  <input type="submit" value="Delete">
 </form>
 
 {% block scripts %}
