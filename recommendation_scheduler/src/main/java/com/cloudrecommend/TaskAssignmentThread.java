@@ -29,12 +29,12 @@ public class TaskAssignmentThread extends Thread {
                     taskQueue.put(task);
                     continue;
                 }
-                System.out.println("Took task " + task.getGroup());
+                System.out.println("Took task " + task.getSite());
                 final String workerId = workersQueue.take();
                 System.out.println("Took worker " + workerId);
                 JSONObject message = new JSONObject();
                 JSON.put(message, "message", "new_task");
-                JSON.put(message, "group_id", task.getGroup());
+                JSON.put(message, "site_id", task.getSite());
                 messageServer.sendMessage(workerId, message.toString());
                 task.updateExecTime();
                 taskQueue.add(task);

@@ -1,16 +1,20 @@
 from flask import Flask
 from mongoengine import connect
+from parseutils import isint
 from sys import argv
 import task_sender
 
 args = argv;
-if len(args) == 3:
+if len(args) == 3 and isint(args[2]):
     # default MongoDB configurations
     connect('cloudrecommend')
     task_sender.start(args[1], int(args[2]))
+elif len(args) == 5 and isint(args[2]) and isint(args[4]):
+    connect('cloudrecommend', host=args[3], port=int(args[4]))
+    task_sender.start(args[1], int(args[2]))
 else:
-    connect('cloudrecommend', host=args[1], port=int(args[2]))
-    task_sender.start(args[3], int(args[4]))
+    print('ERROR - arguments are <scheduler_host> <scheduler_port> <mongodb_host (optional)> <mongodb_port (optional)>')
+    exit(1)
 
 app = Flask(__name__)
 

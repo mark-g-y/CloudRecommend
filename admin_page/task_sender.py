@@ -23,7 +23,7 @@ def send_tasks(receiver_host, receiver_port, queue):
 
 
 def add_task(site, delay_between_runs):
-    queue.put(json.dumps({'message':'new_task', 'group':site, 'delayBetweenExec':delay_between_runs}))
+    queue.put(json.dumps({'message':'new_task', 'site':site, 'delayBetweenExec':delay_between_runs}))
 
 
 def start(receiver_host, receiver_port):

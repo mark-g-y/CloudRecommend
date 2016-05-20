@@ -5,32 +5,32 @@ import affinity_generator
 
 
 hdfsUri = None
-hbaseUri = None
+hbaseZkUri = None
 mongoUri = None
 
 
-def init(hdfsuri='hdfs://localhost:9000/', hbaseuri='localhost:9090', mongouri='mongodb://localhost:27017/'):
-    global hdfsUri, hbaseUri, mongoUri
-    hdfsUri = hdfsuri
-    hbaseUri = hbaseuri
+def init(hdfsuri='hdfs://localhost:9000/', hbasezkuri='localhost:9090', mongouri='mongodb://localhost:27017/'):
+    global hdfsUri, hbaseZkUri, mongoUri
+    hdfsUri = hdfsuri + 'cloudrecommend/'
+    hbaseZkUri = hbasezkuri
     mongoUri = mongouri
 
 
-def run(group):
-    print('running '  + group)
-    hbconn = happybase.Connection(hbaseUri.split(':')[0], int(hbaseUri.split(':')[1]))
-    group_uii = group + '__uii'
-    group_itoi = group + '__itoi'
+def run(site):
+    print('running '  + site)
+    hbconn = happybase.Connection(hbaseZkUri.split(':')[0], int(hbaseZkUri.split(':')[1]))
+    site_uii = site + '__uii'
+    site_itoi = site + '__itoi'
 
     try:
-        hbconn.create_table(group_uii, {'uii':dict()})
-        hbconn.create_table(group_itoi, {'itoi':dict()})
+        hbconn.create_table(site_uii, {'uii':dict()})
+        hbconn.create_table(site_itoi, {'itoi':dict()})
     except:
         # no worries - continue
         print('table already exists')
     hbconn.close()
     
     affinity_generator.init(mongouri=mongoUri)
-    affinity_generator.generate(group)
+    affinity_generator.generate(site)
     #<TODO> switch from local to mapreduce mode in production
-    os.system('pig -x local -param filename={}{} -param group_uii={} -param group_itoi={} recommend.pig'.format(hdfsUri, group, group_uii, group_itoi))
+    os.system('pig -x local -param filename={}{} -param hbase_zk_uri={} -param site_uii={} -param site_itoi={} recommend.pig'.format(hdfsUri, site, hbaseZkUri, site_uii, site_itoi))

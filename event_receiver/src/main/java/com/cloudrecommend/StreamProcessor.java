@@ -1,12 +1,9 @@
 
 package com.cloudrecommend;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.OutputStream;
-import java.io.IOException;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -17,7 +14,6 @@ import kafka.consumer.KafkaStream;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.util.Progressable;
 
 import org.json.JSONObject;
 
@@ -27,6 +23,7 @@ public class StreamProcessor implements Runnable {
     private int processId;
     private KafkaStream stream;
     private String hdfsUri;
+    private final String HDFS_PARENT_DIR = "cloudrecommend";
 
     public StreamProcessor(int processId, KafkaStream stream, String hdfsUri) {
         this.processId = processId;
@@ -65,8 +62,8 @@ public class StreamProcessor implements Runnable {
             Calendar cal = Calendar.getInstance();
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
             String date = format.format(cal.getTime());
-            String eventGroup = event.getString("group");
-            String path = eventGroup + "/" + eventGroup + "_" + date + "_" + id;
+            String eventSite = event.getString("site");
+            String path = HDFS_PARENT_DIR + "/" + eventSite + "/" + eventSite + "_" + date + "_" + id;
 
             Configuration conf = new Configuration();
             conf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
@@ -74,7 +71,8 @@ public class StreamProcessor implements Runnable {
             conf.set("dfs.client.block.write.replace-datanode-on-failure.enable", "false");
 
             FileSystem hdfs = FileSystem.get(new URI(hdfsUri), conf);
-            hdfs.mkdirs(new Path(hdfsUri + eventGroup));
+            hdfs.mkdirs(new Path(hdfsUri + HDFS_PARENT_DIR));
+            hdfs.mkdirs(new Path(hdfsUri + HDFS_PARENT_DIR + "/" + eventSite));
             Path file = new Path(hdfsUri + path);
             if (!hdfs.exists(file)) {
                 hdfs.create(file);

@@ -4,6 +4,7 @@ package com.cloudrecommend;
 import com.cloudrecommend.communications.*;
 import com.cloudrecommend.db.MongoConfig;
 import com.cloudrecommend.models.Task;
+import com.cloudrecommend.util.ParseUtils;
 
 public class RecommendationScheduler {
 
@@ -16,10 +17,14 @@ public class RecommendationScheduler {
         TaskAssignmentThread.runInstance(messageServer);
     }
 
-    public static void main(String[] arg) {
-        int serverPort = Integer.parseInt(arg[0]);
-        String mongoHost = arg[1];
-        int mongoPort = Integer.parseInt(arg[2]);
+    public static void main(String[] args) {
+        if (args.length != 3 || !ParseUtils.isInt(args[0]) || !ParseUtils.isInt(args[2])) {
+            System.out.println("ERROR - arguments are <myPort> <mongoDbHost> <mongoDbPort>");
+            System.exit(1);
+        }
+        int serverPort = Integer.parseInt(args[0]);
+        String mongoHost = args[1];
+        int mongoPort = Integer.parseInt(args[2]);
 
         MongoConfig.getInstance().init(mongoHost, mongoPort);
 

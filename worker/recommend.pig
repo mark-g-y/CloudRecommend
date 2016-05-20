@@ -1,4 +1,6 @@
 
+set hbase.zookeeper.quorum '$hbase_zk_uri'
+
 register 'affinityprocessor.py' using jython as affinity;
 register 'itemsummarizer.py' using jython as summarizer;
 
@@ -34,7 +36,7 @@ uii = foreach uii {
     fields = summarizer.merge_uii_rec(uii.user, $1, top_score);
     generate fields.user as key, fields.user, fields.items;
 }
-store uii into 'hbase://$group_uii' using org.apache.pig.backend.hadoop.hbase.HBaseStorage('uii:user,uii:items');
+store uii into 'hbase://$site_uii' using org.apache.pig.backend.hadoop.hbase.HBaseStorage('uii:user,uii:items');
 
 i_to_i = group i_to_i by item1;
 i_to_i = foreach i_to_i {
@@ -50,4 +52,4 @@ i_to_i = foreach i_to_i {
     fields = summarizer.merge_itoi_rec(i_to_i.item1, $1, top_score);
     generate fields.item as key, fields.item, fields.items;
 }
-store i_to_i into 'hbase://$group_itoi' using org.apache.pig.backend.hadoop.hbase.HBaseStorage('itoi:item,itoi:items');
+store i_to_i into 'hbase://$site_itoi' using org.apache.pig.backend.hadoop.hbase.HBaseStorage('itoi:item,itoi:items');

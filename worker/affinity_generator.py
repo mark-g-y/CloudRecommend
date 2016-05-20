@@ -13,14 +13,15 @@ def init(mongouri='mongodb://localhost:27017/'):
     mongoUri = mongouri
 
 
-def get_event_score_map(group):
+def get_event_score_map(site):
     mongo = MongoClient(mongoUri)
     sites = mongo.cloudrecommend.site
-    site = sites.find_one({'uid' : group})
+    site = sites.find_one({'uid' : site})
     event_to_score_map = {}
     for event in site['events']:
         event_to_score_map[event['name']] = event['score']
     mongo.close()
+    return event_to_score_map
 
 
 def get_time_max_limits():
@@ -34,11 +35,11 @@ def get_time_max_limits():
     return time_max_limits, adjustments
 
 
-def generate(group):
+def generate(site):
     env = Environment(loader=FileSystemLoader('.'))
     template = env.get_template('affinityprocessor_template.py')
 
-    event_to_score_map = get_event_score_map(group)
+    event_to_score_map = get_event_score_map(site)
     time_max_limits, adjustments = get_time_max_limits()
 
     affinityprocessor = open('affinityprocessor.py', 'wb')

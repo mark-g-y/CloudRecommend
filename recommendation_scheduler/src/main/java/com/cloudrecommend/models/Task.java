@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class Task implements Comparable {
 
-    private String group;
+    private String site;
     private long delayBetweenExec;
     private long execTime;
 
@@ -17,14 +17,14 @@ public class Task implements Comparable {
         this(group, delayBetweenExec, System.currentTimeMillis() - delayBetweenExec);
     }
 
-    public Task(String group, long delayBetweenExec, long lastRun) {
-        this.group = group;
+    public Task(String site, long delayBetweenExec, long lastRun) {
+        this.site = site;
         this.delayBetweenExec = delayBetweenExec;
         this.execTime = lastRun + delayBetweenExec;
     }
 
-    public String getGroup() {
-        return group;
+    public String getSite() {
+        return site;
     }
 
     public long getExecTime() {
@@ -37,7 +37,7 @@ public class Task implements Comparable {
         Mongo mongo = new Mongo(mongoConfig.host(), mongoConfig.port());
         DB db = mongo.getDB("cloudrecommend");
         DBCollection sites = db.getCollection("site");
-        BasicDBObject query = new BasicDBObject().append("uid", group);
+        BasicDBObject query = new BasicDBObject().append("uid", site);
         BasicDBObject update = new BasicDBObject().append("$set", new BasicDBObject("last_run", System.currentTimeMillis()));
         sites.update(query, update);
         mongo.close();

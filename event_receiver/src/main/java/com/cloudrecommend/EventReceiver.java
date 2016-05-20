@@ -13,6 +13,8 @@ import kafka.consumer.ConsumerConfig;
 import kafka.consumer.KafkaStream;
 import kafka.javaapi.consumer.ConsumerConnector;
 
+import com.cloudrecommend.util.ParseUtils;
+
 public class EventReceiver {
 
     private static final int DEFAULT_NUM_STREAMS = 1;
@@ -60,8 +62,12 @@ public class EventReceiver {
 
     public static void main(String[] arg) {
         int numProcesses = DEFAULT_NUM_STREAMS;
-        if (arg.length == 3) {
-            numProcesses = Integer.parseInt(arg[1]);
+        if (arg.length == 3 && !ParseUtils.isInt(arg[2]) || arg.length != 3 && arg.length != 2) {
+            System.out.println("ERROR - arguments are <zookeeper_uri> <hdfs_uri> <numProcesses (optional)>");
+            System.out.println("URI arguments are in format <host>:<port>");
+            System.exit(1);
+        } else if (arg.length == 3) {
+            numProcesses = Integer.parseInt(arg[2]);
         }
         String zookeeperUri = arg[0];
         String hdfsUri = arg[1];

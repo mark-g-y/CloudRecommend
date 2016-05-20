@@ -22,9 +22,9 @@ public class MessageReceiverImpl implements MessageReceiver {
         JSONObject message = JSON.create(messageStr);
         System.out.println("received message " + message);
         if ("new_task".equals(JSON.getString(message, "message"))) {
-            String group = JSON.getString(message, "group");
+            String site = JSON.getString(message, "site");
             long delayBetweenExec = JSON.getLong(message, "delayBetweenExec");
-            taskQueue.add(new Task(group, delayBetweenExec));
+            taskQueue.add(new Task(site, delayBetweenExec));
         } else if ("worker_ready".equals(JSON.getString(message, "message"))) {
             workersQueue.add(clientId);
         }
