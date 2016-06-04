@@ -3,7 +3,6 @@ package com.cloudrecommend;
 
 import com.cloudrecommend.communications.*;
 import com.cloudrecommend.db.MongoConfig;
-import com.cloudrecommend.models.Task;
 import com.cloudrecommend.util.ParseUtils;
 
 public class RecommendationScheduler {
