@@ -12,7 +12,7 @@ def init(_site_id):
 
 def event(user, item, event):
     event_message = {
-        'group' : site_id,
+        'site_id' : site_id,
         'user' : user,
         'item' : item,
         'event' : event
