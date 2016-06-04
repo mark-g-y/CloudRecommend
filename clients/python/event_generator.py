@@ -7,6 +7,7 @@ site_id = None
 
 
 def init(_site_id):
+    global site_id
     site_id = _site_id
 
 

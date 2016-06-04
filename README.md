@@ -64,10 +64,37 @@ Next, whenever a user performs one of the aforementioned events, send a message 
 ```
 Site ID is the ID of the site, as determined from the admin web console. User is the unique ID of the user performing the event. Item is the item ID. Event is the event name, as specified in the web console (from our example, this would be either 'like', 'view', or 'purchase').
 
-When you want to query the recommendations, simply make an HTTP request to the client API. 
+Within clients/python, there is a event_generator library that does this for you. Just make sure you call init() with the site ID first.
+
+When you want to query the recommendations, simply make an HTTP request to the client API.
+
+Within clients/python, there is a recommendation_retrieval library that does this for you. Just make sure you call init() with the API URI and site ID first.
 
 If you would like recommendations for a user, make a request to /recommendations/user with an "user" and a "site" param (user ID and site ID respectively).
 
+The output format is:
+```
+{
+    "result" : [
+        {"score":1, "item":"ball_id"},
+        {"score":0.375, "item":"net_id"},
+        {"score":0.25, "item":"shoes_id"}
+    ],
+    "status" : "success"
+}
+```
+
 If you would like recommendations for an item, make a request to /recommendations/item with an "item" and a "site" param (item ID and site ID respectively).
+
+The output format is:
+```
+{
+    "result" : [
+        {"score":1, "item":"ball_id"},
+        {"score":0.5, "item":"shoes_id"}
+    ],
+    "status" : "success"
+}
+```
 
 And that's it! As a user, you don't need to worry about the underlying works, it's all abstracted away for you.
